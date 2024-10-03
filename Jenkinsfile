@@ -1,10 +1,8 @@
 pipeline {
     agent any
 	environment {
-        PRODUCTION_IP_ADDRESS = '35.162.27.193'
-        
+        PRODUCTION_IP_ADDRESS = '172.31.16.34'
     }
-	
     
     tools {
         nodejs "nodejs"
@@ -43,14 +41,14 @@ pipeline {
                 }
             }
         }  
-		 stage('Debug Environment Variable') {
+		
+		stage('Debug Environment Variable') {
             steps {
                 script {
                     echo "PRODUCTION_IP_ADDRESS: $PRODUCTION_IP_ADDRESS"
                 }
             }
         }
-		
 
         stage('Add Host to known_hosts') {
             steps {
@@ -74,17 +72,17 @@ pipeline {
                         chmod 600 $DEPLOY_SSH_KEY
                         ssh -v -i $DEPLOY_SSH_KEY ubuntu@$PRODUCTION_IP_ADDRESS '
                             if [ ! -d "todos-app" ]; then
-                                git clone https://github.com/sagarmondi/My_codes.git My_codes
-                                cd My_codes
+                                git clone https://github.com/sagarmondi/code_analysis.git code_analysis
+                                cd code_analysis
                             else
-                                cd My_codes
+                                cd code_analysis
                                 git pull
                             fi
 
                             yarn install
 
-                            if pm2 describe My_codes > /dev/null ; then
-                                pm2 restart My_codes
+                            if pm2 describe code_analysis > /dev/null ; then
+                                pm2 restart code_analysis
                             else
                                 yarn start:pm2
                             fi
